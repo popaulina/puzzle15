@@ -15,7 +15,6 @@
 	* {
 		margin: 0;
 		padding: 0;
-		mar
 	}
 
 	.box {
@@ -33,7 +32,7 @@
 
 <script type="text/javascript">
 	var container = document.getElementById("container");
-	var boxes = [];
+	var boxes = {};
 	//create boxes and move them accordingly
 	for (i=0; i<15; i++) {
 	    var div = document.createElement('div');
@@ -48,7 +47,7 @@
 	    div.innerHTML = '<p>' + (i+1) + '</p>';
 	    container.appendChild(div);
 
-	    boxes.push({box: div, row: row, column: column});
+	    boxes[i] = {box: div, row: row, column: column};
 	}
 	
 	//the empty square
@@ -58,6 +57,18 @@
 	emptySpace.style.marginLeft = '150px';
 	emptySpace.style.marginTop = '150px';
 	container.appendChild(emptySpace);
+	var emptyObject = {box: emptySpace, row: 3, column: 3};
+
+	var canBeMoved = false;
+	var matchingRow = false;
+
+	
+
+
+
+
+
+
 
 
 </script>
