@@ -31,6 +31,7 @@
 </style>
 
 <script type="text/javascript">
+	//dom setup
 	var container = document.getElementById("container");
 	var boxes = {};
 	//create boxes and move them accordingly
@@ -56,9 +57,11 @@
 	emptySpace.setAttribute("class", "box");
 	emptySpace.style.marginLeft = '150px';
 	emptySpace.style.marginTop = '150px';
+	emptySpace.style['background-color'] = 'white';
 	container.appendChild(emptySpace);
 	var emptyBox = {box: emptySpace, row: 3, column: 3};
 
+	//global variables
 	//checking for matches, holding click
 	var matchingColumn = false;
 	var matchingRow = false;
@@ -66,9 +69,18 @@
 	//how far the boxes have been moved 
 	var distance = 0;
 	//boxes to be moved
+	var pickedBox = null;
 	var matchedBoxes = [];
 	//position of mouse when clicked
 	var originalPos = {x: 0, y: 0};
+	//direction of travel
+	var directionEnum = {
+		RIGHT: 0,
+		LEFT: 1,
+		UP: 2,
+		DOWN: 3
+	};
+	var direction = null;
 
 	document.body.onmousedown = function(e) {
 		originalPos.x = e.screenX;
@@ -79,10 +91,18 @@
 		if (isNaN(elementId)) return;
 
 		//get the box, find if it is valid to move
-		var pickedBox = boxes[elementId];
-		if (pickedBox.row === emptyBox.row) matchingRow = true; 
-		else if (pickedBox.column === emptyBox.column) matchingColumn = true; 
-		
+		pickedBox = boxes[elementId];
+		if (pickedBox.row === emptyBox.row) {
+			matchingRow = true; 
+			if (pickedBox.column < emptyBox.column) direction = directionEnum.RIGHT;
+			else direction = directionEnum.LEFT;
+		}
+		else if (pickedBox.column === emptyBox.column) {
+			matchingColumn = true; 
+			if (pickedBox.row < emptyBox.row) direction = directionEnum.DOWN;
+			else direction = directionEnum.UP;
+		}
+
 		//find all boxes that need to be moved
 		if (matchingRow) matchedBoxes = findBoxesInRow(pickedBox); 
 		else if (matchingColumn) matchedBoxes = findBoxesInColumn(pickedBox); 
@@ -93,17 +113,51 @@
 	}
 
 	document.body.onmouseup = function() {
+		mouseUp = true;
+		matchingColumn = false;
+		matchingRow = false;
+
+		if (direction === directionEnum.RIGHT || direction === directionEnum.DOWN) {
+			if (distance >= 50) {
+				completeMove();
+			}
+			else {
+				resetBoxes();
+				return;
+			}
+		} 
+		else {
+			if (distance <= -50) {
+				completeMove();
+			}
+			else {
+				resetBoxes();
+				return;
+			}
+		}
 
 	}
 
 	document.body.onmousemove = function(e) {
 		if (!mouseUp) {
-			//now we check what direction to change the margin for
-			console.log(matchedBoxes);
+			//now we check what direction to change the margin for, and move the boxes
 			if (matchingRow) {
 				distance = e.screenX - originalPos.x;
-			 	if (emptyBox.column > matchedBoxes[0].column && inBetween(distance, 0, 50)) {
+			 	if (direction === directionEnum.RIGHT && inBetween(distance, 0, 50)) {
 					matchedBoxes.forEach(x => x.box.style.marginLeft = ((x.column * 50) + distance) + "px");
+				}
+				if (direction === directionEnum.LEFT && inBetween(distance, 0, -50)) {
+					matchedBoxes.forEach(x => x.box.style.marginLeft = ((x.column * 50) + distance) + "px");
+				}
+			}
+
+			if (matchingColumn) {
+				distance = e.screenY - originalPos.y;
+			 	if (direction === directionEnum.UP && inBetween(distance, 0, -50)) {
+					matchedBoxes.forEach(x => x.box.style.marginTop = ((x.row * 50) + distance) + "px");
+				}
+				if (direction === directionEnum.DOWN && inBetween(distance, 0, 50)) {
+					matchedBoxes.forEach(x => x.box.style.marginTop = ((x.column * 50) + distance) + "px");
 				}
 			}
 		}
@@ -133,5 +187,36 @@
 	function inBetween(num, first, second) {
 		return (first < num && num < second) 
 				|| (second < num && num < first);
+	}
+
+	function resetBoxes() {
+		matchedBoxes.forEach(x => x.box.style.marginLeft = (x.column * 50) + "px");
+		matchedBoxes.forEach(x => x.box.style.marginTop = (x.row * 50) + "px");
+	}
+
+	function completeMove() {
+		emptyBox.row = pickedBox.row;
+		emptyBox.column = pickedBox.column;
+		emptyBox.box.style.marginLeft = (emptyBox.column * 50) + "px";
+		emptyBox.box.style.marginTop = (emptyBox.row * 50) + "px";
+
+		matchedBoxes.forEach(function (x) {
+			if (direction === directionEnum.RIGHT) {
+				x.column = x.column + 1;
+				x.box.style.marginLeft = (x.column * 50) + "px";
+			}
+			else if (direction === directionEnum.LEFT) {
+				x.column = x.column - 1;
+				x.box.style.marginLeft = (x.column * 50) + "px";
+			}
+			else if (direction === directionEnum.UP) {
+				x.row = x.row - 1;
+				x.box.style.marginTop = (x.row * 50) + "px";
+			}
+			else {
+				x.row = x.row + 1;
+				x.box.style.marginTop = (x.row * 50) + "px";
+			}
+		});
 	}
 </script>
