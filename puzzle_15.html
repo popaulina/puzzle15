@@ -157,7 +157,7 @@
 					matchedBoxes.forEach(x => x.box.style.marginTop = ((x.row * 50) + distance) + "px");
 				}
 				if (direction === directionEnum.DOWN && inBetween(distance, 0, 50)) {
-					matchedBoxes.forEach(x => x.box.style.marginTop = ((x.column * 50) + distance) + "px");
+					matchedBoxes.forEach(x => x.box.style.marginTop = ((x.row * 50) + distance) + "px");
 				}
 			}
 		}
@@ -190,11 +190,13 @@
 	}
 
 	function resetBoxes() {
+		distance = 0;
 		matchedBoxes.forEach(x => x.box.style.marginLeft = (x.column * 50) + "px");
 		matchedBoxes.forEach(x => x.box.style.marginTop = (x.row * 50) + "px");
 	}
 
 	function completeMove() {
+		distance = 0;
 		emptyBox.row = pickedBox.row;
 		emptyBox.column = pickedBox.column;
 		emptyBox.box.style.marginLeft = (emptyBox.column * 50) + "px";
