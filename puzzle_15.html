@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+</head>
+
+<body>
+<div id="container">
+</div>
+</body>
+
+</html>
+
+<style type="text/css">
+	* {
+		margin: 0;
+		padding: 0;
+		mar
+	}
+
+	.box {
+		width: 50px;
+		height: 50px;
+		position: absolute;
+		float: left;
+		border: 1px solid;
+		background-color: grey;
+		opacity: .7;
+		color: white;
+		text-align: center;
+	}
+</style>
+
+<script type="text/javascript">
+	var container = document.getElementById("container");
+	var boxes = [];
+	//create boxes and move them accordingly
+	for (i=0; i<15; i++) {
+	    var div = document.createElement('div');
+	    div.setAttribute("id", i);
+	    div.setAttribute("class", "box");
+	    
+	    var column = i%4;
+	    div.style.marginLeft = (50 * column) + "px";
+	    var row = Math.floor(i/4);
+	    div.style.marginTop = (50 * row) + "px";
+
+	    div.innerHTML = '<p>' + (i+1) + '</p>';
+	    container.appendChild(div);
+
+	    boxes.push({box: div, row: row, column: column});
+	}
+	
+	//the empty square
+	var emptySpace = document.createElement('div');
+	emptySpace.setAttribute("id", "empty");
+	emptySpace.setAttribute("class", "box");
+	emptySpace.style.marginLeft = '150px';
+	emptySpace.style.marginTop = '150px';
+	container.appendChild(emptySpace);
+
+
+</script>
