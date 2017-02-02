@@ -6,18 +6,21 @@
 </head>
 
 <body>
-<div id="container">
+<div id="container" onmouseleave="resetBoxes()">
 </div>
 </body>
 
 </html>
 
 <script type="text/javascript">
+	var convertText = function(text) {
+		return window.btoa("<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'><text x='25' y='30' text-anchor='middle' font-family='arial' font-size='20'>" + text + "</text></svg>");
+	}
 	//dom setup
 	var container = document.getElementById("container");
 	var boxes = {};
 	//create boxes and move them accordingly
-	for (i=0; i<15; i++) {
+	for (var i=0; i<15; i++) {
 	    var div = document.createElement('div');
 	    div.setAttribute("id", i);
 	    div.setAttribute("class", "box");
@@ -26,8 +29,8 @@
 	    div.style.marginLeft = (50 * column) + "px";
 	    var row = Math.floor(i/4);
 	    div.style.marginTop = (50 * row) + "px";
+	    div.style.backgroundImage = "url(data:image/svg+xml;base64," + convertText(i) + ")";
 
-	    div.innerHTML = '<p>' + (i+1) + '</p>';
 	    container.appendChild(div);
 
 	    boxes[i] = {box: div, row: row, column: column};
@@ -66,7 +69,7 @@
 		originalPos.y = e.screenY;
 
 		e = e || window.event;
-			var elementId = (e.target || e.srcElement).id;
+		var elementId = (e.target || e.srcElement).id;
 		if (isNaN(elementId)) return;
 
 		//get the box, find if it is valid to move
@@ -90,16 +93,7 @@
 	}
 
 	document.body.onmouseup = function() {
-		mouseUp = true;
-		matchingColumn = false;
-		matchingRow = false;
-
-		if (direction === directionEnum.RIGHT || direction === directionEnum.DOWN) {
-			distance >= 50 ? completeMove() : resetBoxes();
-		} 
-		else {
-			distance <= -50 ? completeMove() : resetBoxes();
-		}
+		resetBoxes();
 	}
 
 	//move the box based on direction 
@@ -115,21 +109,25 @@
 			//now we check what direction to change the margin for, and move the boxes
 			if (matchingRow) {
 				distance = e.screenX - originalPos.x;
-			 	if (direction === directionEnum.RIGHT && inBetween(distance, 0, 50)) {
-					matchedBoxes.forEach(x => moveHorizontal(x));
+			 	if (direction === directionEnum.RIGHT) {
+			 		if (inBetween(distance, 0, 25)) matchedBoxes.forEach(x => moveHorizontal(x));
+			 		if (inBetween(distance, 25, 50)) completeMove();
 				}
-				if (direction === directionEnum.LEFT && inBetween(distance, 0, -50)) {
-					matchedBoxes.forEach(x => moveHorizontal(x));
+				if (direction === directionEnum.LEFT) {
+					if (inBetween(distance, 0, -25)) matchedBoxes.forEach(x => moveHorizontal(x));
+					if (inBetween(distance, -25, -50)) completeMove(); 
 				}
 			}
 
 			if (matchingColumn) {
 				distance = e.screenY - originalPos.y;
-			 	if (direction === directionEnum.UP && inBetween(distance, 0, -50)) {
-					matchedBoxes.forEach(x => moveVertical(x));
+			 	if (direction === directionEnum.UP) {
+			 		if (inBetween(distance, 0, -25)) matchedBoxes.forEach(x => moveVertical(x));
+			 		if (inBetween(distance, -25, -50)) completeMove();
 				}
-				if (direction === directionEnum.DOWN && inBetween(distance, 0, 50)) {
-					matchedBoxes.forEach(x => moveVertical(x));
+				if (direction === directionEnum.DOWN) {
+					if (inBetween(distance, 0, 25)) matchedBoxes.forEach(x => moveVertical(x));
+			 		if (inBetween(distance, 25, 50)) completeMove();
 				}
 			}
 		}
@@ -155,12 +153,18 @@
 	}
 
 	function resetBoxes() {
+		mouseUp = true;
+		matchingColumn = false;
+		matchingRow = false;
 		distance = 0;
 		matchedBoxes.forEach(x => moveHorizontal(x));
 		matchedBoxes.forEach(x => moveVertical(x));
 	}
 
 	function completeMove() {
+		mouseUp = true;
+		matchingColumn = false;
+		matchingRow = false;
 		distance = 0;
 		emptyBox.row = pickedBox.row;
 		emptyBox.column = pickedBox.column;
@@ -188,4 +192,5 @@
 			}
 		});
 	}
+
 </script>
