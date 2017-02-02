@@ -6,6 +6,10 @@
 </head>
 
 <body>
+<div class="title">
+	<h2>15 Puzzle</h2>
+	<hr>
+</div>
 <div id="container" onmouseleave="resetBoxes()">
 </div>
 </body>
@@ -14,7 +18,7 @@
 
 <script type="text/javascript">
 	var convertText = function(text) {
-		return window.btoa("<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='50px' width='120px'><text x='25' y='30' text-anchor='middle' font-family='arial' font-size='20'>" + text + "</text></svg>");
+		return window.btoa("<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='100px' width='100px'><text x='50' y='60' text-anchor='middle' font-family='arial' font-size='40'>" + text + "</text></svg>");
 	}
 	//dom setup
 	var container = document.getElementById("container");
@@ -26,10 +30,10 @@
 	    div.setAttribute("class", "box");
 	    
 	    var column = i%4;
-	    div.style.marginLeft = (50 * column) + "px";
+	    div.style.marginLeft = (100 * column) + "px";
 	    var row = Math.floor(i/4);
-	    div.style.marginTop = (50 * row) + "px";
-	    div.style.backgroundImage = "url(data:image/svg+xml;base64," + convertText(i) + ")";
+	    div.style.marginTop = (100 * row) + "px";
+	    div.style.backgroundImage = "url(data:image/svg+xml;base64," + convertText(i+1) + ")";
 
 	    container.appendChild(div);
 
@@ -98,10 +102,10 @@
 
 	//move the box based on direction 
 	var moveHorizontal = function(x) {
-		x.box.style.marginLeft = ((x.column * 50) + distance) + "px";
+		x.box.style.marginLeft = ((x.column * 100) + distance) + "px";
 	}
 	var moveVertical = function(x) {
-		x.box.style.marginTop = ((x.row * 50) + distance) + "px";
+		x.box.style.marginTop = ((x.row * 100) + distance) + "px";
 	}
 
 	document.body.onmousemove = function(e) {
@@ -110,24 +114,24 @@
 			if (matchingRow) {
 				distance = e.screenX - originalPos.x;
 			 	if (direction === directionEnum.RIGHT) {
-			 		if (inBetween(distance, 0, 25)) matchedBoxes.forEach(x => moveHorizontal(x));
-			 		if (inBetween(distance, 25, 50)) completeMove();
+			 		if (inBetween(distance, 0, 50)) matchedBoxes.forEach(x => moveHorizontal(x));
+			 		if (inBetween(distance, 50, 100)) completeMove();
 				}
 				if (direction === directionEnum.LEFT) {
-					if (inBetween(distance, 0, -25)) matchedBoxes.forEach(x => moveHorizontal(x));
-					if (inBetween(distance, -25, -50)) completeMove(); 
+					if (inBetween(distance, 0, -50)) matchedBoxes.forEach(x => moveHorizontal(x));
+					if (inBetween(distance, -50, -100)) completeMove(); 
 				}
 			}
 
 			if (matchingColumn) {
 				distance = e.screenY - originalPos.y;
 			 	if (direction === directionEnum.UP) {
-			 		if (inBetween(distance, 0, -25)) matchedBoxes.forEach(x => moveVertical(x));
-			 		if (inBetween(distance, -25, -50)) completeMove();
+			 		if (inBetween(distance, 0, -50)) matchedBoxes.forEach(x => moveVertical(x));
+			 		if (inBetween(distance, -50, -100)) completeMove();
 				}
 				if (direction === directionEnum.DOWN) {
-					if (inBetween(distance, 0, 25)) matchedBoxes.forEach(x => moveVertical(x));
-			 		if (inBetween(distance, 25, 50)) completeMove();
+					if (inBetween(distance, 0, 50)) matchedBoxes.forEach(x => moveVertical(x));
+			 		if (inBetween(distance, 50, 100)) completeMove();
 				}
 			}
 		}
@@ -144,6 +148,7 @@
 			else if (!directionRow && found.column == pickedBox.column && inBetween(found.row, pickedBox.row, emptyBox.row)) 
 				boxesToMove.push(found);		
 		});
+		boxesToMove.forEach(x => x.box.style.backgroundColor = '#4D9093');
 		return boxesToMove;
 	}
 
@@ -153,19 +158,13 @@
 	}
 
 	function resetBoxes() {
-		mouseUp = true;
-		matchingColumn = false;
-		matchingRow = false;
-		distance = 0;
+		reset();
 		matchedBoxes.forEach(x => moveHorizontal(x));
 		matchedBoxes.forEach(x => moveVertical(x));
 	}
 
 	function completeMove() {
-		mouseUp = true;
-		matchingColumn = false;
-		matchingRow = false;
-		distance = 0;
+		reset();
 		emptyBox.row = pickedBox.row;
 		emptyBox.column = pickedBox.column;
 		moveHorizontal(emptyBox);
@@ -191,6 +190,14 @@
 					break;
 			}
 		});
+	}
+
+	function reset() {
+		mouseUp = true;
+		matchingColumn = false;
+		matchingRow = false;
+		distance = 0;
+		matchedBoxes.forEach(x => x.box.style.backgroundColor = '#A2E1E4');
 	}
 
 </script>

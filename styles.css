@@ -4,19 +4,20 @@
 }
 
 .box {
-	width: 50px;
-	height: 50px;
+	width: 100px;
+	height: 100px;
 	position: absolute;
+	margin: 2px;
 	float: left;
 	border: 1px solid;
 	border-radius: 25px;
 	text-align: center;
-
+	background-color: #A2E1E4;
 }
 
 .empty-box {
-	width: 50px;
-	height: 50px;
+	width: 100px;
+	height: 100px;
 	position: absolute;
 	float: left;
 	background-color: white;
@@ -25,7 +26,15 @@
 	margin-top: 150px;
 }
 
+.title {
+	width: 80%;
+	margin-left: 10%;
+	padding: 20px;
+	font-family: 'arial';
+}
+
 #container {
-	height: 250px;
-	width: 250px;
+	height: 500px;
+	width: 500px;
+	margin: auto;
 }
