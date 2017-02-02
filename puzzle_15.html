@@ -2,6 +2,7 @@
 <html>
 <head>
 <title></title>
+<link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 
 <body>
@@ -10,36 +11,6 @@
 </body>
 
 </html>
-
-<style type="text/css">
-	* {
-		margin: 0;
-		padding: 0;
-	}
-
-	.box {
-		width: 50px;
-		height: 50px;
-		position: absolute;
-		float: left;
-		border: 1px solid;
-		background-color: grey;
-		opacity: .7;
-		color: white;
-		text-align: center;
-	}
-
-	.empty-box {
-		width: 50px;
-		height: 50px;
-		position: absolute;
-		float: left;
-		background-color: white;
-		opacity: 0;
-		margin-left: 150px;
-		margin-top: 150px;
-	}
-</style>
 
 <script type="text/javascript">
 	//dom setup
@@ -61,7 +32,7 @@
 
 	    boxes[i] = {box: div, row: row, column: column};
 	}
-	
+
 	//the empty square
 	var emptySpace = document.createElement('div');
 	emptySpace.setAttribute("id", "empty");
@@ -95,7 +66,7 @@
 		originalPos.y = e.screenY;
 
 		e = e || window.event;
-  		var elementId = (e.target || e.srcElement).id;
+			var elementId = (e.target || e.srcElement).id;
 		if (isNaN(elementId)) return;
 
 		//get the box, find if it is valid to move
@@ -110,8 +81,8 @@
 		}
 
 		//find all boxes that need to be moved
-		if (matchingRow) matchedBoxes = findBoxesInRow(); 
-		else if (matchingColumn) matchedBoxes = findBoxesInColumn(); 
+		if (matchingRow) matchedBoxes = findBoxes(true); 
+		else if (matchingColumn) matchedBoxes = findBoxes(false); 
 
 		if (!matchingColumn && !matchingRow) return;
 
@@ -165,21 +136,14 @@
 	}
 
 	//find any boxes in between the chosen box and empty space that should be moved
-	function findBoxesInRow() {
+	//directionRow: bool of whether the boxes are in a row
+	function findBoxes(directionRow) {
 		var boxesToMove = [pickedBox];
 		Object.keys(boxes).forEach(function(id) {
 			var found = boxes[id];	
-			if (found.row == pickedBox.row && inBetween(found.column, pickedBox.column, emptyBox.column)) 
-				boxesToMove.push(found);		
-		});
-		return boxesToMove;
-	}
-
-	function findBoxesInColumn() {
-		var boxesToMove = [pickedBox];
-		Object.keys(boxes).forEach(function(id) {
-			var found = boxes[id];	
-			if (found.column == pickedBox.column && inBetween(found.row, pickedBox.row, emptyBox.row)) 
+			if (directionRow && found.row == pickedBox.row && inBetween(found.column, pickedBox.column, emptyBox.column)) 
+				boxesToMove.push(found);
+			else if (!directionRow && found.column == pickedBox.column && inBetween(found.row, pickedBox.row, emptyBox.row)) 
 				boxesToMove.push(found);		
 		});
 		return boxesToMove;
