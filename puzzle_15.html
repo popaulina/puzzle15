@@ -28,6 +28,17 @@
 		color: white;
 		text-align: center;
 	}
+
+	.empty-box {
+		width: 50px;
+		height: 50px;
+		position: absolute;
+		float: left;
+		background-color: white;
+		opacity: 0;
+		margin-left: 150px;
+		margin-top: 150px;
+	}
 </style>
 
 <script type="text/javascript">
@@ -54,10 +65,7 @@
 	//the empty square
 	var emptySpace = document.createElement('div');
 	emptySpace.setAttribute("id", "empty");
-	emptySpace.setAttribute("class", "box");
-	emptySpace.style.marginLeft = '150px';
-	emptySpace.style.marginTop = '150px';
-	emptySpace.style['background-color'] = 'white';
+	emptySpace.setAttribute("class", "empty-box");
 	container.appendChild(emptySpace);
 	var emptyBox = {box: emptySpace, row: 3, column: 3};
 
@@ -94,18 +102,16 @@
 		pickedBox = boxes[elementId];
 		if (pickedBox.row === emptyBox.row) {
 			matchingRow = true; 
-			if (pickedBox.column < emptyBox.column) direction = directionEnum.RIGHT;
-			else direction = directionEnum.LEFT;
+			direction = pickedBox.column < emptyBox.column ? directionEnum.RIGHT : directionEnum.LEFT;
 		}
 		else if (pickedBox.column === emptyBox.column) {
 			matchingColumn = true; 
-			if (pickedBox.row < emptyBox.row) direction = directionEnum.DOWN;
-			else direction = directionEnum.UP;
+			direction = pickedBox.row < emptyBox.row ? directionEnum.DOWN : directionEnum.UP;
 		}
 
 		//find all boxes that need to be moved
-		if (matchingRow) matchedBoxes = findBoxesInRow(pickedBox); 
-		else if (matchingColumn) matchedBoxes = findBoxesInColumn(pickedBox); 
+		if (matchingRow) matchedBoxes = findBoxesInRow(); 
+		else if (matchingColumn) matchedBoxes = findBoxesInColumn(); 
 
 		if (!matchingColumn && !matchingRow) return;
 
@@ -118,24 +124,19 @@
 		matchingRow = false;
 
 		if (direction === directionEnum.RIGHT || direction === directionEnum.DOWN) {
-			if (distance >= 50) {
-				completeMove();
-			}
-			else {
-				resetBoxes();
-				return;
-			}
+			distance >= 50 ? completeMove() : resetBoxes();
 		} 
 		else {
-			if (distance <= -50) {
-				completeMove();
-			}
-			else {
-				resetBoxes();
-				return;
-			}
+			distance <= -50 ? completeMove() : resetBoxes();
 		}
+	}
 
+	//move the box based on direction 
+	var moveHorizontal = function(x) {
+		x.box.style.marginLeft = ((x.column * 50) + distance) + "px";
+	}
+	var moveVertical = function(x) {
+		x.box.style.marginTop = ((x.row * 50) + distance) + "px";
 	}
 
 	document.body.onmousemove = function(e) {
@@ -144,27 +145,27 @@
 			if (matchingRow) {
 				distance = e.screenX - originalPos.x;
 			 	if (direction === directionEnum.RIGHT && inBetween(distance, 0, 50)) {
-					matchedBoxes.forEach(x => x.box.style.marginLeft = ((x.column * 50) + distance) + "px");
+					matchedBoxes.forEach(x => moveHorizontal(x));
 				}
 				if (direction === directionEnum.LEFT && inBetween(distance, 0, -50)) {
-					matchedBoxes.forEach(x => x.box.style.marginLeft = ((x.column * 50) + distance) + "px");
+					matchedBoxes.forEach(x => moveHorizontal(x));
 				}
 			}
 
 			if (matchingColumn) {
 				distance = e.screenY - originalPos.y;
 			 	if (direction === directionEnum.UP && inBetween(distance, 0, -50)) {
-					matchedBoxes.forEach(x => x.box.style.marginTop = ((x.row * 50) + distance) + "px");
+					matchedBoxes.forEach(x => moveVertical(x));
 				}
 				if (direction === directionEnum.DOWN && inBetween(distance, 0, 50)) {
-					matchedBoxes.forEach(x => x.box.style.marginTop = ((x.row * 50) + distance) + "px");
+					matchedBoxes.forEach(x => moveVertical(x));
 				}
 			}
 		}
 	}
 
 	//find any boxes in between the chosen box and empty space that should be moved
-	function findBoxesInRow(pickedBox) {
+	function findBoxesInRow() {
 		var boxesToMove = [pickedBox];
 		Object.keys(boxes).forEach(function(id) {
 			var found = boxes[id];	
@@ -174,7 +175,7 @@
 		return boxesToMove;
 	}
 
-	function findBoxesInColumn(pickedBox) {
+	function findBoxesInColumn() {
 		var boxesToMove = [pickedBox];
 		Object.keys(boxes).forEach(function(id) {
 			var found = boxes[id];	
@@ -191,33 +192,35 @@
 
 	function resetBoxes() {
 		distance = 0;
-		matchedBoxes.forEach(x => x.box.style.marginLeft = (x.column * 50) + "px");
-		matchedBoxes.forEach(x => x.box.style.marginTop = (x.row * 50) + "px");
+		matchedBoxes.forEach(x => moveHorizontal(x));
+		matchedBoxes.forEach(x => moveVertical(x));
 	}
 
 	function completeMove() {
 		distance = 0;
 		emptyBox.row = pickedBox.row;
 		emptyBox.column = pickedBox.column;
-		emptyBox.box.style.marginLeft = (emptyBox.column * 50) + "px";
-		emptyBox.box.style.marginTop = (emptyBox.row * 50) + "px";
+		moveHorizontal(emptyBox);
+		moveVertical(emptyBox);
 
 		matchedBoxes.forEach(function (x) {
-			if (direction === directionEnum.RIGHT) {
-				x.column = x.column + 1;
-				x.box.style.marginLeft = (x.column * 50) + "px";
-			}
-			else if (direction === directionEnum.LEFT) {
-				x.column = x.column - 1;
-				x.box.style.marginLeft = (x.column * 50) + "px";
-			}
-			else if (direction === directionEnum.UP) {
-				x.row = x.row - 1;
-				x.box.style.marginTop = (x.row * 50) + "px";
-			}
-			else {
-				x.row = x.row + 1;
-				x.box.style.marginTop = (x.row * 50) + "px";
+			switch(direction) {
+				case directionEnum.RIGHT: 
+					x.column = x.column + 1;
+					moveHorizontal(x);
+					break;
+				case directionEnum.LEFT: 
+					x.column = x.column - 1;
+					moveHorizontal(x);
+					break;
+				case directionEnum.UP: 
+					x.row = x.row - 1;
+					moveVertical(x);
+					break;
+				default: 
+					x.row = x.row + 1;
+					moveVertical(x);
+					break;
 			}
 		});
 	}
